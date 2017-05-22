@@ -47,3 +47,54 @@ var publisher = {
 		}
 	}
 }
+// 这个publisher就是一个通用的发布者对象，当我们想定制一个发布者的时候，只需要把这个publisher上的方法和subscribes属性遍历添加上去
+
+
+// 比如我们用paper这个例子，有两个type，daily是日报，mothly是月刊
+var paper = {
+	daily: function () {
+		this.publish("这里是日报");
+	},
+	mothly: function () {
+		this.publish("这里是月刊", "mothly");
+	}
+}
+
+// 用makePublisher函数遍历添加方法到定制对象上
+function makePublisher(obj) {
+	for (i in publisher) {
+		if (publisher.hasOwnProperty(i) && typeof publisher[i] === "function") {
+			obj[i] = publisher[i];
+		}
+	}
+	obj.subscribes = {
+		any: []
+	};
+	return obj;
+}
+
+makePublisher(paper);
+
+
+// 现在paper就被转变为一个发布者了
+// 接下来，我们再定制一个订阅者joe，他会在每天早上喝咖啡的看日报，月末的时候看看月刊
+var joe = {
+	drinkCoffee: function (paper) {
+		console.log("喝咖啡的时候" + paper);
+	},
+	endOfMothe: function (mothly) {
+		console.log("月末的时候" + mothly)
+	}
+}
+
+// 订阅者定制好了，需要向发布者订阅
+paper.subscribe(joe.drinkCoffee);
+paper.subscribe(joe.endOfMothe, "mothly");
+
+// 现在，订阅者和发布者的联系就全部确定了
+paper.daily();
+paper.mothly();
+// 只需要触发daily和mothly方法就可以完成事件的发布了
+
+
+
